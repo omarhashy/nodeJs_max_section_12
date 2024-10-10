@@ -1,8 +1,27 @@
-const Sequelize = require('sequelize');
+const mongodb = require("mongodb");
+const MongoClient = mongodb.MongoClient;
 
-const sequelize = new Sequelize('node-complete', 'root', 'omar', {
-  dialect: 'mysql',
-  host: 'localhost'
-});
+const PASSWORD = process.env.PASSWORD;
+let _db;
 
-module.exports = sequelize;
+const mongoConnect = (callback) => {
+
+  MongoClient.connect(
+    `mongodb+srv://omarhashy:${PASSWORD}@cluster0.qzjhm.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0`
+  )
+    .then((client) => {
+      _db = client.db();
+      callback(client);
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
+};
+
+const getDb = () => {
+  if (_db) return _db;
+  throw "No db found";
+};
+module.exports.mongoConnect = mongoConnect;
+module.exports.getDb = getDb;
